@@ -35,8 +35,22 @@ while not done:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			done = True
+			# =================WORK ON THIS NEXT: Ball movement with arrow keys===================
+		if event.type == pygame.KEYDOWN:
+			if event == K.LEFT:
+				pass
+			if event == K.RIGHT:
+				pass
+			if event == K.UP:
+				pass
+			if event == K.DOWN:
+				pass
+
+			# ====================================
     # fills window with black
 	screen.fill((0, 0, 0))
+
+
 
     # uses Ball method "draw" to paint the ball in its current position on the screen.
 	ball1.draw()
