@@ -29,6 +29,9 @@ clock = pygame.time.Clock()
 # creates a new ball object named "ball1" with position (100, 100), a radius of 20 and on the screen window.
 ball1 = Ball(100, 100, 20, screen)
 
+# controls speed of ball between frames
+vel = 5
+
 # begin game loop. Will continue to loop until done == True
 while not done:
     # loops through event cue checking for Pygame QUIT event. If QUIT is True in any event, done = True and the game loop ends.
@@ -36,17 +39,29 @@ while not done:
 		if event.type == pygame.QUIT:
 			done = True
 			# =================WORK ON THIS NEXT: Ball movement with arrow keys===================
+		
+		# "keys" holds Bool values for all keyboard keys
+		keys = pygame.key.get_pressed()
+		# Sets frame rate variable
+		move_ticker = 0
 		if event.type == pygame.KEYDOWN:
-			if event == K.LEFT:
-				pass
-			if event == K.RIGHT:
-				pass
-			if event == K.UP:
-				pass
-			if event == K.DOWN:
-				pass
-
+			if keys[pygame.K_LEFT]:
+				if move_ticker == 0:
+					move_ticker = 10
+					ball1.x -= vel
+					if ball1.x <= 0:
+						ball1.x = 0
+			if event.key == pygame.K_RIGHT:
+				ball1.x += vel
+			if event.key == pygame.K_UP:
+				ball1.y -= vel
+			if event.key == pygame.K_DOWN:
+				ball1.y += vel
+	# decrementing framerate variable. 
+	if move_ticker > 0:
+		move_ticker -= 1
 			# ====================================
+
     # fills window with black
 	screen.fill((0, 0, 0))
 
