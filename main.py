@@ -85,5 +85,6 @@ while not done:
 
 	#Update the screen
 	pygame.display.flip()
+	
 	#Set the FPS value to 60
 	clock.tick(60)
