@@ -1,77 +1,89 @@
-# gain access to the pygame module
 import pygame
 
-# defines guidelines for all "Ball" objects
+#Define variables wich represent the size of the map we want
+SCREEN_WIDTH = 400
+SCREEN_HEIGHT = 300
+
+#Create the ball class
 class Ball:
-    # Every time a 'Ball' type object is created it has these attributes and must have an x, y, radius and screen to pass in
-	def __init__(self, x, y, radius, screen):
-        # all passed in attributes become instance-specific
+	#Ball class constructor
+	def __init__(self, x, y, radius, color, screen):
+		#A ball need a position (x,y), a radius, a color and the screen where we will paint it, therefore
+		#the constructor will take these as arguments and save their values in variables of the ball class by using the word self
 		self.x = x
 		self.y = y
 		self.radius = radius
 		self.screen = screen
-    # draws a blue circle with the instance's radius in the instance's x,y position
+		self.color = color
+
+	#The draw function will be responsible for drawing the ball in the screen	
 	def draw(self):
-		pygame.draw.circle(screen, (0, 0, 255), [self.x, self.y], self.radius)
+		pygame.draw.circle(screen, self.color, [self.x, self.y], self.radius)
 
-# initializes pygame. Required to start using the module.
+#New class for the player's ball. This class extends Ball because it has the same base features but is more specific
+class PlayerBall(Ball):
+	#The move function is responsible for changing the position of the ball based on the user input
+	def move(self, mv_type):
+		#Update the coordinates based on the key that was pressed
+		if mv_type == "UP":
+			self.y -= 2
+		elif mv_type == "DOWN":
+			self.y += 2
+		elif mv_type == "LEFT":
+			self.x -= 2
+		elif mv_type == "RIGHT":
+			self.x += 2
+
+		#If the ball has passed the bounds of the map then update it's position so that it stays inside
+		if self.x - self.radius < 0:
+			self.x = self.radius
+		elif self.x + self.radius > SCREEN_WIDTH:
+			self.x = SCREEN_WIDTH - self.radius
+		if self.y - self.radius < 0:
+			self.y = self.radius
+		elif self.y + self.radius > SCREEN_HEIGHT:
+			self.y = SCREEN_HEIGHT - self.radius
+
+#The next two lines initiate the game and set the window size by the values we defined on the variables SCREEN_HEIGHT and SCREEN_WIDTH
 pygame.init()
-
-# sets the window at 400px wide by 300 px tall
-screen = pygame.display.set_mode((400, 300))
-
-# sets variable for game loop to false
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+#The next variable represents if the user wants to quit the game (when the value is True) or not (when the value is False)
+#Since we want the game to run we start it with as False
 done = False
 
-# Not sure exactly what Clock function is. I'm guessing it tracks the amount of time since Pygame was initialized.
+#Create a clock value that allows us to set the FPS value we want
 clock = pygame.time.Clock()
 
-# creates a new ball object named "ball1" with position (100, 100), a radius of 20 and on the screen window.
-ball1 = Ball(100, 100, 20, screen)
+#Create a new ball object
+ball1 = PlayerBall(100, 100, 20, (0,0,0), screen)
 
-# controls speed of ball between frames
-vel = 5
-
-# begin game loop. Will continue to loop until done == True
+#While the user doesn't quit
 while not done:
-    # loops through event cue checking for Pygame QUIT event. If QUIT is True in any event, done = True and the game loop ends.
+	#Listen to all events that happen
 	for event in pygame.event.get():
+		#If it's a quit event then set done to true so the game will finish
 		if event.type == pygame.QUIT:
 			done = True
-			# =================WORK ON THIS NEXT: Ball movement with arrow keys===================
-		
-		# "keys" holds Bool values for all keyboard keys
-		keys = pygame.key.get_pressed()
-		# Sets frame rate variable
-		move_ticker = 0
-		if event.type == pygame.KEYDOWN:
-			if keys[pygame.K_LEFT]:
-				if move_ticker == 0:
-					move_ticker = 10
-					ball1.x -= vel
-					if ball1.x <= 0:
-						ball1.x = 0
-			if event.key == pygame.K_RIGHT:
-				ball1.x += vel
-			if event.key == pygame.K_UP:
-				ball1.y -= vel
-			if event.key == pygame.K_DOWN:
-				ball1.y += vel
-	# decrementing framerate variable. 
-	if move_ticker > 0:
-		move_ticker -= 1
-			# ====================================
 
-    # fills window with black
-	screen.fill((0, 0, 0))
+	#Listen for keys pressed
+	pressed = pygame.key.get_pressed()
+	#Call the function to update the ball's position based on the keys that are being pressed
+	if pressed[pygame.K_UP]:
+		ball1.move("UP")
+	if pressed[pygame.K_DOWN]:
+		ball1.move("DOWN")
+	if pressed[pygame.K_LEFT]:
+		ball1.move("LEFT")
+	if pressed[pygame.K_RIGHT]:
+		ball1.move("RIGHT")
 
+	#Paint the screen white
+	screen.fill((255, 255, 255))
 
-
-    # uses Ball method "draw" to paint the ball in its current position on the screen.
+	#Call the draw method of the ball object we created
 	ball1.draw()
 
-    # updates the window
+	#Update the screen
 	pygame.display.flip()
-
-    # game loop updates every 60 ms
+	#Set the FPS value to 60
 	clock.tick(60)
