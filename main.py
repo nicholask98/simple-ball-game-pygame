@@ -57,6 +57,10 @@ clock = pygame.time.Clock()
 #Create a new ball object
 ball1 = PlayerBall(100, 100, 20, (0,0,0), screen)
 
+# Create goal ball object
+ball2 = Ball(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100, 5, (0, 255, 0), screen)
+green_last_hori_wall = 'TOP'
+green_last_vert_wall = 'RIGHT'
 #While the user doesn't quit
 while not done:
 	#Listen to all events that happen
@@ -77,10 +81,40 @@ while not done:
 	if pressed[pygame.K_RIGHT]:
 		ball1.move("RIGHT")
 
+		# WORK ON THIS NEXT =======================
+		# green ball should move diagonally each frame based on the last two walls it touched
+
+	if green_last_hori_wall == 'TOP':
+		if green_last_vert_wall == 'RIGHT':
+			ball2.x -= 3
+			ball2.y += 2
+		elif green_last_vert_wall == 'LEFT':
+			ball2.x += 3
+			ball2.y += 2
+	elif green_last_hori_wall == 'BOTTOM':
+		if green_last_vert_wall == 'RIGHT':
+			ball2.x -= 3
+			ball2.y -= 2
+		elif green_last_vert_wall == 'LEFT':
+			ball2.x += 3
+			ball2.y -= 2
+
+	if ball2.x >= SCREEN_WIDTH:
+		green_last_vert_wall == 'RIGHT'
+	if ball2.x <= SCREEN_WIDTH:
+		green_last_vert_wall == 'LEFT'
+	if ball2.y <= SCREEN_HEIGHT:
+		green_last_hori_wall == 'TOP'
+	if ball2.y >= SCREEN_HEIGHT:
+		green_last_hori_wall == 'BOTTOM'
+
+	# ============================
+
 	#Paint the screen white
 	screen.fill((255, 255, 255))
 
 	#Call the draw method of the ball object we created
+	ball2.draw()
 	ball1.draw()
 
 	#Update the screen
