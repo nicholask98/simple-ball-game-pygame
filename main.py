@@ -44,25 +44,50 @@ class PlayerBall(Ball):
 		elif self.y + self.radius > SCREEN_HEIGHT:
 			self.y = SCREEN_HEIGHT - self.radius
 
+	def input_check(self, pressed):
+		if pressed[pygame.K_UP]:
+			self.move("UP")
+		if pressed[pygame.K_DOWN]:
+			self.move("DOWN")
+		if pressed[pygame.K_LEFT]:
+			self.move("LEFT")
+		if pressed[pygame.K_RIGHT]:
+			self.move("RIGHT")
+
 class AutoBall(Ball):
-	def move(self, hori_wall, vert_wall):
-		if hori_wall == 'TOP':
-			if vert_wall == 'RIGHT':
+	def __init__(self, x, y, radius, color, screen):
+		Ball.__init__(self, x, y, radius, color, screen)
+		self.hori_wall = 'TOP'
+		self.vert_wall = 'RIGHT'
+
+	def move(self):
+		if self.hori_wall == 'TOP':
+			if self.vert_wall == 'RIGHT':
 				self.x -= 3
 				self.y += 2
-			elif vert_wall == 'LEFT':
+			elif self.vert_wall == 'LEFT':
 				self.x += 3
 				self.y += 2
-		elif hori_wall == 'BOTTOM':
-			if vert_wall == 'RIGHT':
+		elif self.hori_wall == 'BOTTOM':
+			if self.vert_wall == 'RIGHT':
 				self.x -= 3
 				self.y -= 2
-			elif vert_wall == 'LEFT':
+			elif self.vert_wall == 'LEFT':
 				self.x += 3
 				self.y -= 2
 	
+
+	# BETTER THAN NOTHING FOR NOW LOL
+	# vvv Keeps green ball on the screen but doesn't yet change its direction
 	def wall_check(self):
-		pass
+		if self.x - self.radius < 0:
+			self.vert_wall = "LEFT"
+		elif self.x + self.radius > SCREEN_WIDTH:
+			self.vert_wall = "RIGHT"
+		if self.y - self.radius < 0:
+			self.hori_wall = "TOP"
+		elif self.y + self.radius > SCREEN_HEIGHT:
+			self.hori_wall = "BOTTOM"
 	
 
 #The next two lines initiate the game and set the window size by the values we defined on the variables SCREEN_HEIGHT and SCREEN_WIDTH
@@ -80,8 +105,6 @@ ball1 = PlayerBall(100, 100, 20, (0,0,0), screen)
 
 # Create goal ball AutoBall Instance object
 ball2 = AutoBall(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100, 5, (0, 255, 0), screen)
-green_last_hori_wall = 'TOP'
-green_last_vert_wall = 'RIGHT'
 
 #While the user doesn't quit
 while not done:
@@ -93,32 +116,17 @@ while not done:
 
 	#Listen for keys pressed
 	pressed = pygame.key.get_pressed()
+
 	#Call the function to update the ball's position based on the keys that are being pressed
-	if pressed[pygame.K_UP]:
-		ball1.move("UP")
-	if pressed[pygame.K_DOWN]:
-		ball1.move("DOWN")
-	if pressed[pygame.K_LEFT]:
-		ball1.move("LEFT")
-	if pressed[pygame.K_RIGHT]:
-		ball1.move("RIGHT")
+	ball1.input_check(pressed)
 
-		# WORK ON THIS NEXT =======================
-		# green ball should move diagonally each frame based on the last two walls it touched
+	# Checks last two walls the green ball contacted, then moves the green ball
+	ball2.wall_check()
+	ball2.move()
 
-	ball2.move(green_last_hori_wall, green_last_vert_wall)
-
-
-	if ball2.x >= SCREEN_WIDTH:
-		green_last_vert_wall == 'RIGHT'
-	if ball2.x <= SCREEN_WIDTH:
-		green_last_vert_wall == 'LEFT'
-	if ball2.y <= SCREEN_HEIGHT:
-		green_last_hori_wall == 'TOP'
-	if ball2.y >= SCREEN_HEIGHT:
-		green_last_hori_wall == 'BOTTOM'
-
-	# ============================
+	# FIXME: NEXT TO DO!!!
+	# Add Score variable (Not sure if right here is the best place). Detect if the two balls are
+	# in contact, and if so, increment score variable by 10
 
 	#Paint the screen white
 	screen.fill((255, 255, 255))
