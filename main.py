@@ -46,18 +46,18 @@ class PlayerBall(Ball):
 
 class AutoBall(Ball):
 	def move(self, hori_wall, vert_wall):
-		if green_last_hori_wall == 'TOP':
-			if green_last_vert_wall == 'RIGHT':
+		if hori_wall == 'TOP':
+			if vert_wall == 'RIGHT':
 				self.x -= 3
 				self.y += 2
-			elif green_last_vert_wall == 'LEFT':
+			elif vert_wall == 'LEFT':
 				self.x += 3
 				self.y += 2
-		elif green_last_hori_wall == 'BOTTOM':
-			if green_last_vert_wall == 'RIGHT':
+		elif hori_wall == 'BOTTOM':
+			if vert_wall == 'RIGHT':
 				self.x -= 3
 				self.y -= 2
-			elif green_last_vert_wall == 'LEFT':
+			elif vert_wall == 'LEFT':
 				self.x += 3
 				self.y -= 2
 	
@@ -107,6 +107,7 @@ while not done:
 		# green ball should move diagonally each frame based on the last two walls it touched
 
 	ball2.move(green_last_hori_wall, green_last_vert_wall)
+
 
 	if ball2.x >= SCREEN_WIDTH:
 		green_last_vert_wall == 'RIGHT'
