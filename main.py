@@ -44,6 +44,27 @@ class PlayerBall(Ball):
 		elif self.y + self.radius > SCREEN_HEIGHT:
 			self.y = SCREEN_HEIGHT - self.radius
 
+class AutoBall(Ball):
+	def move(self, hori_wall, vert_wall):
+		if green_last_hori_wall == 'TOP':
+			if green_last_vert_wall == 'RIGHT':
+				self.x -= 3
+				self.y += 2
+			elif green_last_vert_wall == 'LEFT':
+				self.x += 3
+				self.y += 2
+		elif green_last_hori_wall == 'BOTTOM':
+			if green_last_vert_wall == 'RIGHT':
+				self.x -= 3
+				self.y -= 2
+			elif green_last_vert_wall == 'LEFT':
+				self.x += 3
+				self.y -= 2
+	
+	def wall_check(self):
+		pass
+	
+
 #The next two lines initiate the game and set the window size by the values we defined on the variables SCREEN_HEIGHT and SCREEN_WIDTH
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -57,10 +78,11 @@ clock = pygame.time.Clock()
 #Create a new ball object
 ball1 = PlayerBall(100, 100, 20, (0,0,0), screen)
 
-# Create goal ball object
-ball2 = Ball(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100, 5, (0, 255, 0), screen)
+# Create goal ball AutoBall Instance object
+ball2 = AutoBall(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100, 5, (0, 255, 0), screen)
 green_last_hori_wall = 'TOP'
 green_last_vert_wall = 'RIGHT'
+
 #While the user doesn't quit
 while not done:
 	#Listen to all events that happen
@@ -84,20 +106,7 @@ while not done:
 		# WORK ON THIS NEXT =======================
 		# green ball should move diagonally each frame based on the last two walls it touched
 
-	if green_last_hori_wall == 'TOP':
-		if green_last_vert_wall == 'RIGHT':
-			ball2.x -= 3
-			ball2.y += 2
-		elif green_last_vert_wall == 'LEFT':
-			ball2.x += 3
-			ball2.y += 2
-	elif green_last_hori_wall == 'BOTTOM':
-		if green_last_vert_wall == 'RIGHT':
-			ball2.x -= 3
-			ball2.y -= 2
-		elif green_last_vert_wall == 'LEFT':
-			ball2.x += 3
-			ball2.y -= 2
+	ball2.move(green_last_hori_wall, green_last_vert_wall)
 
 	if ball2.x >= SCREEN_WIDTH:
 		green_last_vert_wall == 'RIGHT'
