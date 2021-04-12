@@ -11,4 +11,3 @@ Based on https://www.teachyourselfpython.com/challenges.php?a=03_Pygame_Challeng
 1. Copy and paste the code below
 2. Extend the program to do the following: 
 >> Add a score variable and add a smaller GREEN ball (ball2) (inherits from the ball class) that randomly moves about the screen. When ball1 touches the green ball, the score increments by +10.
-

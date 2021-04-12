@@ -22,6 +22,10 @@ class Ball:
 
 #New class for the player's ball. This class extends Ball because it has the same base features but is more specific
 class PlayerBall(Ball):
+	def __init__(self, x, y, radius, color, screen):
+		Ball.__init__(self, x, y, radius, color, screen)
+		self.score = 0
+
 	#The move function is responsible for changing the position of the ball based on the user input
 	def move(self, mv_type):
 		#Update the coordinates based on the key that was pressed
@@ -75,9 +79,7 @@ class AutoBall(Ball):
 			elif self.vert_wall == 'LEFT':
 				self.x += 3
 				self.y -= 2
-	
 
-	# BETTER THAN NOTHING FOR NOW LOL
 	# vvv Keeps green ball on the screen but doesn't yet change its direction
 	def wall_check(self):
 		if self.x - self.radius < 0:
@@ -89,6 +91,11 @@ class AutoBall(Ball):
 		elif self.y + self.radius > SCREEN_HEIGHT:
 			self.hori_wall = "BOTTOM"
 	
+
+def increment_score():
+	# if ball1 overlaps ball2:
+		# ball1.score += 10
+		
 
 #The next two lines initiate the game and set the window size by the values we defined on the variables SCREEN_HEIGHT and SCREEN_WIDTH
 pygame.init()
@@ -127,6 +134,7 @@ while not done:
 	# FIXME: NEXT TO DO!!!
 	# Add Score variable (Not sure if right here is the best place). Detect if the two balls are
 	# in contact, and if so, increment score variable by 10
+	
 
 	#Paint the screen white
 	screen.fill((255, 255, 255))
