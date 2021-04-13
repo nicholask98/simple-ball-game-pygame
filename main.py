@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from time import sleep
 
 #Define variables wich represent the size of the map we want
 SCREEN_WIDTH = 400
@@ -173,6 +174,21 @@ while not done:
 
 	#Print that label in the screen
 	screen.blit(label, (10, SCREEN_HEIGHT - 20))
+
+	if score == 1000:
+		game_over = myfont.render("YOU WIN!", 1, (0,0,0))
+		screen.blit(game_over, (10, SCREEN_HEIGHT - 50))
+		pygame.display.flip()
+		sleep(5)
+		done = True
+	if score == -1000:		
+		game_over = myfont.render("YOU LOSE!", 1, (0,0,0))
+		screen.blit(game_over, (10, SCREEN_HEIGHT - 50))
+		pygame.display.flip()
+		sleep(5)
+		done = True
+	
+	
 
 	#Call the move function for the green ball
 	ball2.move()
