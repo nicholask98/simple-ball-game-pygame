@@ -63,7 +63,7 @@ class PlayerBall(Ball):
 			#If the same ball hasn't been touched recently update the cooldown and return 10
 			if self.red_cooldown == 0:
 				self.red_cooldown = 10
-				return -10
+				return -50
 		return 0
 
 #This class represents the green ball that gives points when the player's ball touches it
