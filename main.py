@@ -1,4 +1,6 @@
 import pygame
+import random
+import math
 
 #Define variables wich represent the size of the map we want
 SCREEN_WIDTH = 400
@@ -6,7 +8,6 @@ SCREEN_HEIGHT = 300
 
 #Create the ball class
 class Ball:
-	#Ball class constructor
 	def __init__(self, x, y, radius, color, screen):
 		#A ball need a position (x,y), a radius, a color and the screen where we will paint it, therefore
 		#the constructor will take these as arguments and save their values in variables of the ball class by using the word self
@@ -24,11 +25,12 @@ class Ball:
 class PlayerBall(Ball):
 	def __init__(self, x, y, radius, color, screen):
 		Ball.__init__(self, x, y, radius, color, screen)
-		self.score = 0
+		#Add a variable to the PlayerBall class for the cooldown of touching the green ball
+		self.green_cooldown = 0
+		self.red_cooldown = 0
 
 	#The move function is responsible for changing the position of the ball based on the user input
 	def move(self, mv_type):
-		#Update the coordinates based on the key that was pressed
 		if mv_type == "UP":
 			self.y -= 2
 		elif mv_type == "DOWN":
@@ -48,54 +50,80 @@ class PlayerBall(Ball):
 		elif self.y + self.radius > SCREEN_HEIGHT:
 			self.y = SCREEN_HEIGHT - self.radius
 
-	def input_check(self, pressed):
-		if pressed[pygame.K_UP]:
-			self.move("UP")
-		if pressed[pygame.K_DOWN]:
-			self.move("DOWN")
-		if pressed[pygame.K_LEFT]:
-			self.move("LEFT")
-		if pressed[pygame.K_RIGHT]:
-			self.move("RIGHT")
+	#This function checks if the player's ball is touching another ball
+	def check_contact(self, greenBall, redBall):
+		#If the distance between the two centers is less that the sum of the radius of both balls then they are touching
+		if math.sqrt((self.y - greenBall.y) ** 2 + (self.x - greenBall.x) ** 2) < self.radius + greenBall.radius:
+			#If the same ball hasn't been touched recently update the cooldown and return 10
+			if self.green_cooldown == 0:
+				self.green_cooldown = 10
+				return 10
+		if math.sqrt((self.y - redBall.y) ** 2 + (self.x - redBall.x) ** 2) < self.radius + redBall.radius:
+			#If the same ball hasn't been touched recently update the cooldown and return 10
+			if self.red_cooldown == 0:
+				self.red_cooldown = 10
+				return -10
+		return 0
 
-class AutoBall(Ball):
+#This class represents the green ball that gives points when the player's ball touches it
+class GreenBall(Ball):
+	#Similarly to the player's ball, this class extends Ball but has two new variables
 	def __init__(self, x, y, radius, color, screen):
 		Ball.__init__(self, x, y, radius, color, screen)
-		self.hori_wall = 'TOP'
-		self.vert_wall = 'RIGHT'
+		#vx and vy are the velocity values for this ball and are generated randomly when a GreenBall object is created
+		self.vy = random.randint(0, 4) - 2
+		self.vx = random.randint(0, 4) - 2
+		while self.vy == 0 or self.vx == 0:
+			self.vy = random.randint(0, 4) - 2
+			self.vx = random.randint(0, 4) - 2
 
+	#This function will update the ball's position
 	def move(self):
-		if self.hori_wall == 'TOP':
-			if self.vert_wall == 'RIGHT':
-				self.x -= 3
-				self.y += 2
-			elif self.vert_wall == 'LEFT':
-				self.x += 3
-				self.y += 2
-		elif self.hori_wall == 'BOTTOM':
-			if self.vert_wall == 'RIGHT':
-				self.x -= 3
-				self.y -= 2
-			elif self.vert_wall == 'LEFT':
-				self.x += 3
-				self.y -= 2
+		#Add the velocity value to the position
+		self.x += self.vx
+		self.y += self.vy
 
-	# vvv Keeps green ball on the screen but doesn't yet change its direction
-	def wall_check(self):
+		#If the ball is outside the bounds put it inside and multiply the velocity to -1 to change the ball's direction
 		if self.x - self.radius < 0:
-			self.vert_wall = "LEFT"
+			self.x = self.radius
+			self.vx *= -1
 		elif self.x + self.radius > SCREEN_WIDTH:
-			self.vert_wall = "RIGHT"
+			self.x = SCREEN_WIDTH - self.radius
+			self.vx *= -1
 		if self.y - self.radius < 0:
-			self.hori_wall = "TOP"
+			self.y = self.radius
+			self.vy *= -1
 		elif self.y + self.radius > SCREEN_HEIGHT:
-			self.hori_wall = "BOTTOM"
+			self.y = SCREEN_HEIGHT - self.radius
+			self.vy *= -1
 	
+class RedBall(Ball):
+	#Similarly to the player's ball, this class extends Ball but has two new variables
+	def __init__(self, x, y, radius, color, screen):
+		Ball.__init__(self, x, y, radius, color, screen)
+		#vx and vy are the velocity values for this ball and are generated randomly when a RedBall object is created
+		self.vy = random.randint(3, 6) - 2
+		self.vx = random.randint(3, 6) - 2
 
-def increment_score():
-	# if ball1 overlaps ball2:
-		# ball1.score += 10
-		
+	#This function will update the ball's position
+	def move(self):
+		#Add the velocity value to the position
+		self.x += self.vx
+		self.y += self.vy
+
+		#If the ball is outside the bounds put it inside and multiply the velocity to -1 to change the ball's direction
+		if self.x - self.radius < 0:
+			self.x = self.radius
+			self.vx *= -1
+		elif self.x + self.radius > SCREEN_WIDTH:
+			self.x = SCREEN_WIDTH - self.radius
+			self.vx *= -1
+		if self.y - self.radius < 0:
+			self.y = self.radius
+			self.vy *= -1
+		elif self.y + self.radius > SCREEN_HEIGHT:
+			self.y = SCREEN_HEIGHT - self.radius
+			self.vy *= -1
 
 #The next two lines initiate the game and set the window size by the values we defined on the variables SCREEN_HEIGHT and SCREEN_WIDTH
 pygame.init()
@@ -103,15 +131,19 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 #The next variable represents if the user wants to quit the game (when the value is True) or not (when the value is False)
 #Since we want the game to run we start it with as False
 done = False
+#The score variable will store the player's current score
+score = 0
+
+#Set the font and size that will be used
+myfont = pygame.font.SysFont("monospace", 15)
 
 #Create a clock value that allows us to set the FPS value we want
 clock = pygame.time.Clock()
 
-#Create a new ball object
-ball1 = PlayerBall(100, 100, 20, (0,0,0), screen)
-
-# Create goal ball AutoBall Instance object
-ball2 = AutoBall(SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100, 5, (0, 255, 0), screen)
+#Create two ball: the player's ball (PlayerBall class) and the green ball (GreenBall class)
+ball1 = PlayerBall(100, 100, 20, (0, 0, 0), screen)
+ball2 = GreenBall(200, 200, 5, (0, 255, 0), screen)
+ball3 = RedBall(300, 200, 40, (255, 0, 0), screen)
 
 #While the user doesn't quit
 while not done:
@@ -123,28 +155,44 @@ while not done:
 
 	#Listen for keys pressed
 	pressed = pygame.key.get_pressed()
-
 	#Call the function to update the ball's position based on the keys that are being pressed
-	ball1.input_check(pressed)
-
-	# Checks last two walls the green ball contacted, then moves the green ball
-	ball2.wall_check()
-	ball2.move()
-
-	# FIXME: NEXT TO DO!!!
-	# Add Score variable (Not sure if right here is the best place). Detect if the two balls are
-	# in contact, and if so, increment score variable by 10
-	
+	if pressed[pygame.K_UP]:
+		ball1.move("UP")
+	if pressed[pygame.K_DOWN]:
+		ball1.move("DOWN")
+	if pressed[pygame.K_LEFT]:
+		ball1.move("LEFT")
+	if pressed[pygame.K_RIGHT]:
+		ball1.move("RIGHT")
 
 	#Paint the screen white
 	screen.fill((255, 255, 255))
+	
+	#Set the label value to be black and write the actual score
+	label = myfont.render("SCORE: " + str(score), 1, (0,0,0))
 
-	#Call the draw method of the ball object we created
+	#Print that label in the screen
+	screen.blit(label, (10, SCREEN_HEIGHT - 20))
+
+	#Call the move function for the green ball
+	ball2.move()
+	ball3.move()
+	
+	#Add to the score the value returned. (Returns 10 if touching the green ball and 0 otherwise)
+	score += ball1.check_contact(ball2, ball3)
+
+	#Draw both the player's ball and the green ball
+	ball3.draw()
 	ball2.draw()
 	ball1.draw()
 
+	#Update the cooldown for touching the green ball at every frame. When it's value is 0 then we can touch a ball again
+	if ball1.green_cooldown > 0:
+			ball1.green_cooldown -= 1
+	if ball1.red_cooldown > 0:
+			ball1.red_cooldown -= 1
+
 	#Update the screen
 	pygame.display.flip()
-	
 	#Set the FPS value to 60
 	clock.tick(60)
